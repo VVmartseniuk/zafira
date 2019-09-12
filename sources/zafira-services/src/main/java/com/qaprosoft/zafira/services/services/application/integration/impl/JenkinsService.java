@@ -108,7 +108,7 @@ public class JenkinsService extends AbstractIntegration<JenkinsContext> {
 
     public JobResult buildJob(Job job, Map<String, String> jobParameters) {
         JobWithDetails ciJob = getJobWithDetails(job)
-                .orElseThrow(() -> new ForbiddenOperationException("Unable to build CI job"));
+                .orElseThrow(() -> new ForbiddenOperationException("Unable to build CI job", true));
         return buildJob(ciJob, jobParameters);
     }
 
