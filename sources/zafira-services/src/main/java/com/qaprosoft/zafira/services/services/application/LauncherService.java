@@ -39,6 +39,8 @@ import com.qaprosoft.zafira.services.services.application.scm.ScmAccountService;
 import com.qaprosoft.zafira.services.services.auth.JWTService;
 import com.qaprosoft.zafira.services.util.URLResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class LauncherService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LauncherService.class);
 
     private static final String LAUNCHER_JOB_URL_PATTERN = "%s/job/%s/job/launcher";
     private static final String LAUNCHER_JOB_ROOT_URL_PATTERN = "%s/job/launcher";
@@ -183,6 +187,7 @@ public class LauncherService {
         
         Map<String, String> jobParameters = new ObjectMapper().readValue(launcher.getModel(), new TypeReference<Map<String, String>>() {});
 
+        LOGGER.info("SCM account id: " + scmAccount.getId() + "; access token : " + scmAccount.getAccessToken());
         String decryptedAccessToken = cryptoService.decrypt(scmAccount.getAccessToken());
         jobParameters.put("scmURL", scmAccount.buildAuthorizedURL(decryptedAccessToken));
         if (!jobParameters.containsKey("branch")) {
