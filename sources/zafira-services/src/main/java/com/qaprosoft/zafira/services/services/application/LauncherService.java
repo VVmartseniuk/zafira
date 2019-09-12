@@ -188,6 +188,7 @@ public class LauncherService {
         Map<String, String> jobParameters = new ObjectMapper().readValue(launcher.getModel(), new TypeReference<Map<String, String>>() {});
 
         LOGGER.info("SCM account id: " + scmAccount.getId() + "; access token : " + scmAccount.getAccessToken());
+        LOGGER.info("Key: " + cryptoService.context().getKey() + "; Salt: " + cryptoService.context().getSalt());
         String decryptedAccessToken = cryptoService.decrypt(scmAccount.getAccessToken());
         jobParameters.put("scmURL", scmAccount.buildAuthorizedURL(decryptedAccessToken));
         if (!jobParameters.containsKey("branch")) {
