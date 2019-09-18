@@ -27,6 +27,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.GITHUB_ACCESS_TOKEN_REQUEST_FAILED;
+
 @Component
 public class GitHubHttpUtils {
 
@@ -45,7 +47,7 @@ public class GitHubHttpUtils {
         try {
             httpResponse = this.httpClient.send(buildGetAccessTokenRequest(code, clientId, secret), HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
-            throw new ExternalSystemException(e.getMessage(), e);
+            throw new ExternalSystemException(GITHUB_ACCESS_TOKEN_REQUEST_FAILED, e.getMessage(), e);
         }
         return getAccessToken(httpResponse.body().toString());
     }

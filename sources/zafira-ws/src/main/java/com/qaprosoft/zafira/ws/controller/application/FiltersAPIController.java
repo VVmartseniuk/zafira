@@ -28,6 +28,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.FILTER_ACCESS_DENIED;
+
 @Api("Filters API")
 @CrossOrigin
 @RequestMapping(path = "api/filters", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,7 +81,7 @@ public class FiltersAPIController extends AbstractController {
     public FilterType updateFilter(@RequestBody @Valid FilterType filterType) {
         Filter filter = filterService.getFilterById(filterType.getId());
         if (filter != null && !filter.getUserId().equals(getPrincipalId())) {
-            throw new IllegalOperationException("Cannot access to update filter");
+            throw new IllegalOperationException(FILTER_ACCESS_DENIED, "Cannot access to update filter");
         }
         filterType.getSubject().sortCriterias();
         return mapper.map(filterService.updateFilter(mapper.map(filterType, Filter.class), isAdmin()), FilterType.class);
@@ -92,7 +94,7 @@ public class FiltersAPIController extends AbstractController {
     public void deleteFilter(@PathVariable("id") Long id) {
         Filter filter = filterService.getFilterById(id);
         if (filter != null && !filter.getUserId().equals(getPrincipalId())) {
-            throw new IllegalOperationException("Cannot access to delete filter");
+            throw new IllegalOperationException(FILTER_ACCESS_DENIED, "Cannot access to delete filter");
         }
         filterService.deleteFilterById(id);
     }

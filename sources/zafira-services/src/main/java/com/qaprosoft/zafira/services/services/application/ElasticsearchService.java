@@ -49,6 +49,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.ELASTICSEARCH_MALFORMED_SEARCH_REQUEST;
+
 @SuppressWarnings("rawtypes")
 @Component
 public class ElasticsearchService {
@@ -88,37 +90,43 @@ public class ElasticsearchService {
     public Map<String, String> getScreenshotsInfo(String correlationId, String... indices) {
         Map<String, String> result = null;
         if (isClientInitialized()) {
-            try {
-                result = new HashMap<>();
-                SearchResponse response = search(SearchBuilder.ALL, prepareCorrelationIdMap(correlationId), indices);
-                String lastMessage = null;
-                for (SearchHit hit : response.getHits().getHits()) {
-                    if (ElasticsearchResultHelper.getMessage(hit) != null && ElasticsearchResultHelper.getHeaders(hit) == null) {
-                        lastMessage = ElasticsearchResultHelper.getMessage(hit);
-                    }
-                    if (ElasticsearchResultHelper.getHeaders(hit) != null && ElasticsearchResultHelper.getAmazonPath(hit) != null) {
-                        result.put(ElasticsearchResultHelper.getAmazonPath(hit), lastMessage);
-                    }
+            result = new HashMap<>();
+            SearchResponse response = search(SearchBuilder.ALL, prepareCorrelationIdMap(correlationId), indices);
+            String lastMessage = null;
+            for (SearchHit hit : response.getHits().getHits()) {
+                if (ElasticsearchResultHelper.getMessage(hit) != null && ElasticsearchResultHelper.getHeaders(hit) == null) {
+                    lastMessage = ElasticsearchResultHelper.getMessage(hit);
                 }
-            } catch (IOException e) {
-                throw new ExternalSystemException(ERR_MSG_SEARCH_SCREENSHOTS, e);
+                if (ElasticsearchResultHelper.getHeaders(hit) != null && ElasticsearchResultHelper.getAmazonPath(hit) != null) {
+                    result.put(ElasticsearchResultHelper.getAmazonPath(hit), lastMessage);
+                }
             }
         }
         return result;
     }
 
-    public SearchResponse search(SearchBuilder searchBuilder, Map<String, String> map, String... indices) throws IOException {
+    public SearchResponse search(SearchBuilder searchBuilder, Map<String, String> map, String... indices) {
         return search(searchBuilder.apply(map), indices);
     }
 
-    public SearchResponse search(QueryBuilder queryBuilder, String... indices) throws IOException {
+    public SearchResponse search(QueryBuilder queryBuilder, String... indices) {
         SearchResponse result = null;
         if (isClientInitialized()) {
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             searchSourceBuilder.query(queryBuilder);
             SearchRequest request = new SearchRequest();
             request.source(searchSourceBuilder).indices(indices);
-            result = this.client.search(request, RequestOptions.DEFAULT);
+            result = sendSearchRequest(request, RequestOptions.DEFAULT);
+        }
+        return result;
+    }
+
+    private SearchResponse sendSearchRequest(SearchRequest request, RequestOptions requestOptions) {
+        SearchResponse result;
+        try {
+            result = client.search(request, requestOptions);
+        } catch (IOException e) {
+            throw new ExternalSystemException(ELASTICSEARCH_MALFORMED_SEARCH_REQUEST, e.getMessage(), e.getCause());
         }
         return result;
     }

@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.qaprosoft.zafira.services.exceptions.ProcessingException.ProcessingErrorDetail.INVALID_WIDGET_TEMPLATE;
+
 @ApiIgnore
 @RequestMapping(path = "api/widgets", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
@@ -252,7 +254,7 @@ public class WidgetsAPIController extends AbstractController {
             } else {
                 // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
                 // wrap whatever error is thrown
-                throw new ProcessingException(e.getMessage(), e);
+                throw new ProcessingException(INVALID_WIDGET_TEMPLATE, e.getMessage(), e);
             }
         }
         return resultList;

@@ -54,6 +54,9 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.AMAZON_INVALID_SECURITY_TOKEN_CREDENTIALS;
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.AMAZON_MALFORMED_URL_TO_FILE;
+
 public class AmazonIntegrationAdapter extends AbstractIntegrationAdapter implements StorageProviderAdapter {
 
     private static final String FILE_PATH_SEPARATOR = "/";
@@ -167,13 +170,13 @@ public class AmazonIntegrationAdapter extends AbstractIntegrationAdapter impleme
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucket, new URL(linkToFile).getPath().substring(1)));
         } catch (MalformedURLException e) {
-            throw new ExternalSystemException("Cannot remove file from amazon by link " + linkToFile, e);
+            throw new ExternalSystemException(AMAZON_MALFORMED_URL_TO_FILE, "Cannot remove file from amazon by link " + linkToFile, e);
         }
     }
 
     @Override
     public Optional<SessionCredentials> getTemporarySessionCredentials(int expiresIn) {
-        SessionCredentials result = null;
+        SessionCredentials result;
         GetSessionTokenRequest getSessionTokenRequest = new GetSessionTokenRequest();
         GetSessionTokenResult getSessionTokenResult;
         getSessionTokenRequest.setDurationSeconds(expiresIn);
@@ -183,7 +186,7 @@ public class AmazonIntegrationAdapter extends AbstractIntegrationAdapter impleme
             result = new SessionCredentials(credentials.getAccessKeyId(), credentials.getSecretAccessKey(),
                     credentials.getSessionToken(), amazonS3.getRegionName(), bucket);
         } catch (Exception e) {
-            LOGGER.error("Credentials for Security Token Service are invalid.", e);
+            throw new ExternalSystemException(AMAZON_INVALID_SECURITY_TOKEN_CREDENTIALS, "Credentials for Security Token Service are invalid.", e);
         }
         return Optional.ofNullable(result);
     }

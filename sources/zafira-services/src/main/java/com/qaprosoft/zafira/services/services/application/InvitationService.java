@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import static com.qaprosoft.zafira.models.db.Group.Role.ROLE_ADMIN;
 import static com.qaprosoft.zafira.models.db.User.Source.LDAP;
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.DUPLICATE_PENDING_INVITATION;
 
 @Service
 public class InvitationService {
@@ -151,7 +152,7 @@ public class InvitationService {
         }
         if (invitation.getStatus().equals(Invitation.Status.ACCEPTED)) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new IllegalOperationException("Cannot retry invitation due invitation is accepted yet.");
+            throw new IllegalOperationException(DUPLICATE_PENDING_INVITATION, "Cannot resend invitation, invitation is not accepted yet.");
         }
         String token = generateToken();
         invitation.setToken(token);

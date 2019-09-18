@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.qaprosoft.zafira.services.exceptions.ProcessingException.ProcessingErrorDetail.FILE_UPLOAD_FAILED;
+
 @Service
 public class UploadService {
 
@@ -64,7 +66,7 @@ public class UploadService {
             return filename;
         } catch (IOException e) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new ProcessingException("Unable to upload document");
+            throw new ProcessingException(FILE_UPLOAD_FAILED, "Unable to upload document");
         }
     }
 

@@ -15,6 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.zafira.services.services.application;
 
+import com.qaprosoft.zafira.models.db.Setting;
+import com.qaprosoft.zafira.services.exceptions.ExternalSystemException;
+import org.apache.commons.lang.StringUtils;
+import org.jasypt.util.text.BasicTextEncryptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Collection;
@@ -22,21 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
-import org.apache.commons.lang.StringUtils;
-import org.jasypt.util.text.BasicTextEncryptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.qaprosoft.zafira.models.db.Setting;
-import com.qaprosoft.zafira.services.exceptions.EncryptorInitializationException;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.ENCRYPTION_KEY_GENERATION_FAILED;
 
 @Service
 public class CryptoService {
@@ -95,7 +95,7 @@ public class CryptoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void reencrypt() {
+    public void reEncrypt() {
         Map<String, Collection<?>> tempMap = new HashMap<>(collectCollectionsToReencrypt());
         tempMap.forEach(this::decryptCryptoDrivenServiceCollection);
         regenerateKey();
@@ -131,25 +131,27 @@ public class CryptoService {
         });
     }
 
-    private static SecretKey generateKey(String keyType, int size) throws NoSuchAlgorithmException {
+    private static SecretKey generateKey(String keyType, int size) {
         LOGGER.debug("generating key use algorithm: '" + keyType + "'; size: " + size);
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(keyType);
-        keyGenerator.init(size);
+        KeyGenerator keyGenerator = getKeyGenerator(keyType, size);
         return keyGenerator.generateKey();
+    }
+
+    private static KeyGenerator getKeyGenerator(String keyType, int size){
+        KeyGenerator keyGenerator;
+        try {
+            keyGenerator = KeyGenerator.getInstance(keyType);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ExternalSystemException(ENCRYPTION_KEY_GENERATION_FAILED, e.getMessage());
+        }
+        keyGenerator.init(size);
+        return keyGenerator;
     }
 
     private BasicTextEncryptor getBasicTextEncryptor() {
         String key = getCryptoKey();
         BasicTextEncryptor basicTextEncryptor = new BasicTextEncryptor();
-        try {
-            if (!StringUtils.isEmpty(key)) {
-                basicTextEncryptor.setPassword(key + salt);
-            } else {
-                throw new EncryptorInitializationException();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Unable to initialize Crypto Tool, salt or key might be null: " + e.getMessage(), e);
-        }
+        basicTextEncryptor.setPassword(key + salt);
         return basicTextEncryptor;
     }
 

@@ -48,6 +48,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.REQUIRED_ARGUMENT_IS_MISSING;
+
 @Service
 public class LauncherService {
 
@@ -165,7 +167,7 @@ public class LauncherService {
         Job job = launcher.getJob();
         if (job == null) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new IllegalOperationException("Launcher job not specified");
+            throw new IllegalOperationException(REQUIRED_ARGUMENT_IS_MISSING, "Launcher job not specified");
         }
         
         Map<String, String> jobParameters = new ObjectMapper().readValue(launcher.getModel(), new TypeReference<Map<String, String>>() {});
@@ -200,7 +202,7 @@ public class LauncherService {
 
         if (!AutomationServerService.checkArguments(jobParameters)) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new IllegalOperationException("Required arguments not found");
+            throw new IllegalOperationException(REQUIRED_ARGUMENT_IS_MISSING, "Required arguments not found");
         }
 
         automationServerService.buildJob(job, jobParameters);

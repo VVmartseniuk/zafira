@@ -53,6 +53,7 @@ import java.util.UUID;
 import static com.qaprosoft.zafira.models.dto.BuildParameterType.BuildParameterClass.BOOLEAN;
 import static com.qaprosoft.zafira.models.dto.BuildParameterType.BuildParameterClass.HIDDEN;
 import static com.qaprosoft.zafira.models.dto.BuildParameterType.BuildParameterClass.STRING;
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.JENKINS_JOB_REQUEST_FAILED;
 
 public class JenkinsIntegrationAdapter extends AbstractIntegrationAdapter implements AutomationServerAdapter {
 
@@ -274,7 +275,7 @@ public class JenkinsIntegrationAdapter extends AbstractIntegrationAdapter implem
         try {
             job = jenkinsServer.getJob(folderJob, jobName);
         } catch (IOException e) {
-            throw new ExternalSystemException(e.getMessage(), e);
+            throw new ExternalSystemException(JENKINS_JOB_REQUEST_FAILED, e.getMessage(), e);
         }
         return job;
     }
@@ -284,7 +285,7 @@ public class JenkinsIntegrationAdapter extends AbstractIntegrationAdapter implem
         try {
             job = jenkinsServer.getJob(jobName);
         } catch (IOException e) {
-            throw new ExternalSystemException(e.getMessage(), e);
+            throw new ExternalSystemException(JENKINS_JOB_REQUEST_FAILED, e.getMessage(), e);
         }
         return job;
     }

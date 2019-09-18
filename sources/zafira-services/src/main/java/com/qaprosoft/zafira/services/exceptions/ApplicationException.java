@@ -15,7 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.zafira.services.exceptions;
 
+import lombok.Getter;
+
+@Getter
 public abstract class ApplicationException extends RuntimeException {
+
+    private Object[] args;
+
+    public interface ErrorDetail {
+
+        Integer getCode();
+
+        String getMessageKey();
+
+    }
+
+    private ErrorDetail errorDetail;
 
     public ApplicationException() {
         super();
@@ -35,6 +50,26 @@ public abstract class ApplicationException extends RuntimeException {
 
     public ApplicationException(String message, Throwable cause, boolean writableStackTrace) {
         super(message, cause, false, writableStackTrace);
+    }
+
+    ApplicationException(ErrorDetail errorDetail) {
+        this.errorDetail = errorDetail;
+    }
+
+    ApplicationException(ErrorDetail errorDetail, String message, Object... args) {
+        super(message);
+        this.errorDetail = errorDetail;
+        this.args = args;
+    }
+
+    ApplicationException(ErrorDetail errorDetail, String message, Throwable cause) {
+        super(message, cause);
+        this.errorDetail = errorDetail;
+    }
+
+    ApplicationException(ErrorDetail errorDetail, String message, Throwable cause, boolean writableStackTrace) {
+        super(message, cause, false, writableStackTrace);
+        this.errorDetail = errorDetail;
     }
 
 }

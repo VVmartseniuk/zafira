@@ -41,10 +41,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.MULTIPLE_INTEGRATIONS_NOT_ALLOWED;
+
 @Service
 public class IntegrationServiceImpl implements IntegrationService {
 
-    private static final String ERR_MSG_NOT_MULTIPLE_ALLOWED_INTEGRATION = "Integration with type '%s' is not multiple allowed";
+    private static final String ERR_MSG_NOT_MULTIPLE_ALLOWED_INTEGRATION = "Multiple integrations with type '%s' are not allowed";
     private static final String ERR_MSG_INTEGRATION_NOT_FOUND_BY_ID = "Integration with id '%d' not found";
     private static final String ERR_MSG_INTEGRATION_NOT_FOUND_BY_BACK_REFERENCE_ID = "Integration with back reference id '%s' not found";
     private static final String ERR_MSG_DEFAULT_VALUE_IS_NOT_PROViDED_BY_TYPE_ID = "Default value for integration with id '%d' is nod provided";
@@ -246,7 +248,8 @@ public class IntegrationServiceImpl implements IntegrationService {
             // TODO: 9/11/19 switch to count by type
             List<Integration> integrations = retrieveIntegrationsByTypeId(integrationType.getId());
             if (!integrations.isEmpty()) {
-                throw new IllegalOperationException(String.format(ERR_MSG_NOT_MULTIPLE_ALLOWED_INTEGRATION, integrationType.getName()));
+                throw new IllegalOperationException(MULTIPLE_INTEGRATIONS_NOT_ALLOWED,
+                        String.format(ERR_MSG_NOT_MULTIPLE_ALLOWED_INTEGRATION, integrationType.getName()));
             }
         }
     }

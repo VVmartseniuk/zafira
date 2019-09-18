@@ -15,10 +15,36 @@
  ******************************************************************************/
 package com.qaprosoft.zafira.services.exceptions;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 public class ExternalSystemException extends ApplicationException {
 
-    public ExternalSystemException(String message) {
-        super(message);
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public enum ExternalSystemErrorDetail implements ErrorDetail {
+
+        ENCRYPTION_KEY_GENERATION_FAILED(2040),
+        GITHUB_ACCESS_TOKEN_REQUEST_FAILED(2041),
+        ELASTICSEARCH_MALFORMED_SEARCH_REQUEST(2042),
+        JENKINS_JOB_REQUEST_FAILED(2043),
+        JIRA_ISSUE_REQUEST_FAILED(2044),
+        AMAZON_MALFORMED_URL_TO_FILE(2045),
+        AMAZON_INVALID_SECURITY_TOKEN_CREDENTIALS(2046);
+
+        private final Integer code;
+        private String messageKey;
+
+    }
+
+    public ExternalSystemException(ExternalSystemErrorDetail errorDetail, String message) {
+        super(errorDetail, message);
+    }
+
+    public ExternalSystemException(ExternalSystemErrorDetail errorDetail, String message, Throwable cause) {
+        super(errorDetail, message, cause);
     }
 
     public ExternalSystemException(String message, Throwable cause) {

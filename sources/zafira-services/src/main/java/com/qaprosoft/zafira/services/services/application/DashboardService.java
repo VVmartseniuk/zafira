@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.DASHBOARD_ALREADY_EXISTS;
+
 @Service
 public class DashboardService {
 
@@ -44,7 +46,7 @@ public class DashboardService {
     public Dashboard createDashboard(Dashboard dashboard) {
         if (getDashboardByTitle(dashboard.getTitle()) != null) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new IllegalOperationException("Dashboard title '" + dashboard.getTitle() + "' is currently in use");
+            throw new IllegalOperationException(DASHBOARD_ALREADY_EXISTS, "Dashboard title '" + dashboard.getTitle() + "' is currently in use");
         }
         dashboard.setEditable(true);
         dashboardMapper.createDashboard(dashboard);

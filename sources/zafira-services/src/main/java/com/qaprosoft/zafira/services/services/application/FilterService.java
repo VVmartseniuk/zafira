@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.qaprosoft.zafira.services.exceptions.IllegalOperationException.IllegalOperationErrorDetail.FILTER_ALREADY_EXISTS;
+
 @Service
 public class FilterService {
 
@@ -90,7 +92,7 @@ public class FilterService {
         }
         if (!filter.getName().equals(dbFilter.getName()) && isFilterExists(filter)) {
             // TODO by nsidorevich on 2019-09-03: review error code, message and exception type
-            throw new IllegalOperationException("Filter with name '" + filter.getName() + "' already exists");
+            throw new IllegalOperationException(FILTER_ALREADY_EXISTS, "Filter with name '" + filter.getName() + "' already exists");
         }
         dbFilter.setName(filter.getName());
         dbFilter.setDescription(filter.getDescription());

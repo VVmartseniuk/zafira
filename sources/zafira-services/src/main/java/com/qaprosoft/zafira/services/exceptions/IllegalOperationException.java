@@ -15,25 +15,34 @@
  *******************************************************************************/
 package com.qaprosoft.zafira.services.exceptions;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 public class IllegalOperationException extends ApplicationException {
 
-    public IllegalOperationException() {
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public enum IllegalOperationErrorDetail implements ErrorDetail {
+
+        FILTER_ALREADY_EXISTS(2060),
+        FILTER_ACCESS_DENIED(2061),
+        DASHBOARD_ALREADY_EXISTS(2062),
+        DUPLICATE_PENDING_INVITATION(2063),
+        REQUIRED_ARGUMENT_IS_MISSING(2064),
+        MULTIPLE_INTEGRATIONS_NOT_ALLOWED(2065);
+
+        private final Integer code;
+        private String messageKey;
+
     }
 
-    public IllegalOperationException(String message) {
-        super(message);
+    public IllegalOperationException(IllegalOperationErrorDetail errorDetail, String message, Object... args) {
+        super(errorDetail, message, args);
     }
 
-    public IllegalOperationException(Throwable cause) {
-        super(cause);
+    public IllegalOperationException(IllegalOperationErrorDetail errorDetail, String message) {
+        super(errorDetail, message);
     }
-
-    public IllegalOperationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public IllegalOperationException(String message, Throwable cause, boolean writableStackTrace) {
-        super(message, cause, writableStackTrace);
-    }
-
 }

@@ -23,10 +23,13 @@ import com.qaprosoft.zafira.services.services.application.integration.tool.adapt
 import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraClient;
+import net.rcarz.jiraclient.JiraException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+
+import static com.qaprosoft.zafira.services.exceptions.ExternalSystemException.ExternalSystemErrorDetail.JIRA_ISSUE_REQUEST_FAILED;
 
 @SuppressWarnings("deprecation")
 public class JiraIntegrationAdapter extends AbstractIntegrationAdapter implements TestCaseManagementAdapter {
@@ -76,7 +79,7 @@ public class JiraIntegrationAdapter extends AbstractIntegrationAdapter implement
     public boolean isConnected() {
         try {
             return jiraClient.getProjects() != null;
-        } catch (Exception e) {
+        } catch (JiraException e) {
             return false;
         }
     }
@@ -86,8 +89,8 @@ public class JiraIntegrationAdapter extends AbstractIntegrationAdapter implement
         Issue issue;
         try {
             issue = jiraClient.getIssue(ticket);
-        } catch (Exception e) {
-            throw new ExternalSystemException("Unable to find Jira issue: " + ticket, e);
+        } catch (JiraException e) {
+            throw new ExternalSystemException(JIRA_ISSUE_REQUEST_FAILED, "Unable to find Jira issue: " + ticket, e);
         }
         return new TestCaseManagementIssueType(issue.getAssignee().getName(), issue.getReporter().getName(), issue.getSummary(), issue.getStatus().getName());
     }
