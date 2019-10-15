@@ -76,7 +76,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "groups", key = "T(com.qaprosoft.zafira.dbaccess.utils.TenancyContext).tenantName + ':' + #id")
+    @Cacheable(value = "groups", key = "new com.qaprosoft.zafira.dbaccess.utils.TenancyContext().getTenantName() + ':' + #id")
     public Group getGroupById(long id) {
         return groupMapper.getGroupById(id);
     }
