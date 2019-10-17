@@ -426,6 +426,7 @@ public class JenkinsIntegrationAdapter extends AbstractIntegrationAdapter implem
     public JenkinsServer getJenkinsServer() {
         JenkinsServer jenkinsServer;
         try {
+            LOGGER.info("Jenkins with id " + getIntegrationId() + " parameters " + username + ", " + tokenOrPassword + ", " + url);
             JenkinsConfig config = new JenkinsConfig(username, tokenOrPassword, HTTP_TIMEOUT);
             jenkinsServer = new JenkinsServer(new JenkinsClient(new URI(url), config));
         } catch (URISyntaxException e) {
