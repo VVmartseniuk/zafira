@@ -397,8 +397,10 @@ public class JenkinsIntegrationAdapter extends AbstractIntegrationAdapter implem
     @Override
     public boolean isConnected() {
         try {
+            LOGGER.debug("Start to check connection for Jenkins integration " + getIntegrationId());
             return getJenkinsServer().isRunning();
         } catch (Exception e) {
+            LOGGER.debug("Jenkins integration " + getIntegrationId() + " is not connected");
             return false;
         }
     }
